@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>My Week — Planning sportif</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#131e30;--panel2:#1b2940;--line:#2b3b54;--text:#f3f6fb;--muted:#aab7ca;--green:#35c58a;--blue:#7ba7ff;--yellow:#f5cf68}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#182943 0,#0b1220 58%);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:980px;margin:auto;padding:22px 16px 48px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.eyebrow{color:var(--green);font-weight:800;letter-spacing:.14em;font-size:11px}.title{font-size:clamp(30px,6vw,46px);font-weight:900;letter-spacing:-.04em;margin:2px 0}.sub{color:var(--muted);margin:0}.pill{border:1px solid var(--line);background:#17253a;border-radius:999px;padding:8px 12px;color:var(--muted);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0}.stat,.panel{background:linear-gradient(145deg,#17253a,#111b2b);border:1px solid var(--line);border-radius:18px;padding:16px}.num{font-size:28px;font-weight:850}.muted{color:var(--muted);font-size:12px}.progress{height:9px;border-radius:20px;background:#27364d;overflow:hidden;margin-top:10px}.bar{height:100%;background:var(--green);width:0;transition:width .2s}
+.layout{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}.panel h2{font-size:18px;margin:0 0 13px}.weekbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.btn,select{border:1px solid var(--line);background:#1a2a41;color:var(--text);padding:10px 13px;border-radius:11px;font:inherit;cursor:pointer}.btn.active{background:var(--green);border-color:var(--green);color:#062218;font-weight:800}.btn.secondary{background:transparent}.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.daybtn{padding:10px 2px;border:1px solid var(--line);border-radius:12px;background:#111d2e;color:var(--muted);cursor:pointer;font-weight:700}.daybtn.active{background:#244d46;color:#dfffee;border-color:var(--green)}.daybtn small{display:block;font-size:10px;font-weight:500}
+.event{padding:12px;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:12px;background:#17253a;margin:9px 0}.event.gym{border-left-color:var(--green)}.event.sport{border-left-color:var(--yellow)}.event .time{font-size:12px;color:var(--muted)}.event strong{display:block;margin-top:2px}.empty{padding:18px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+.checklist{display:grid;gap:9px}.check{display:flex;align-items:center;gap:10px;background:#17253a;border:1px solid var(--line);padding:12px;border-radius:12px}.check input{width:19px;height:19px;accent-color:var(--green)}.check label{flex:1}.check.done label{text-decoration:line-through;color:var(--muted)}.tag{font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:4px 7px}
+.note{color:var(--muted);font-size:12px;margin-top:12px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.field{display:grid;gap:5px;margin:10px 0}.field label{font-size:12px;color:var(--muted)}.field input,.field select{width:100%;cursor:text}.footer{margin-top:16px;color:var(--muted);font-size:11px;text-align:center}
+@media(max-width:720px){.layout{grid-template-columns:1fr}.stats{gap:7px}.stat{padding:12px}.num{font-size:23px}.days{gap:4px}.daybtn{font-size:12px}}
+</style>
+</head>
+<body>
+<main>
+<header class="top">
+ <div><div class="eyebrow">TON PLANNING PERSONNEL</div><div class="title">MY WEEK<span style="color:var(--green)">.</span></div><p class="sub">Cours, sport et Basic-Fit au même endroit.</p></div>
+ <button class="btn" id="installBtn" hidden>＋ Installer l’appli</button>
+</header>
+<section class="stats">
+ <div class="stat"><div class="num" id="gymCount">3</div><div class="muted">séances Basic-Fit prévues</div></div>
+ <div class="stat"><div class="num">2</div><div class="muted">entraînements sportifs</div></div>
+ <div class="stat"><div class="num" id="doneCount">0/5</div><div class="muted">séances cochées</div><div class="progress"><div class="bar" id="progress"></div></div></div>
+</section>
+<div class="layout">
+ <section class="panel">
+  <h2>Mon calendrier</h2>
+  <div class="weekbar"><button class="btn active" data-week="A">Semaine A</button><button class="btn" data-week="B">Semaine B</button></div>
+  <div class="days" id="days"></div>
+  <div id="dayContent" style="margin-top:14px"></div>
+  <p class="note">Les horaires de cours viennent des deux emplois du temps envoyés. Les cases vides correspondent à du temps libre ou aux pauses.</p>
+ </section>
+ <section class="panel">
+  <h2>Mes entraînements</h2>
+  <div class="checklist" id="checklist"></div>
+  <div class="actions"><button class="btn secondary" id="resetBtn">Réinitialiser les coches</button></div>
+  <p class="note">La progression est enregistrée automatiquement sur cet appareil.</p>
+ </section>
+</div>
+<section class="panel" style="margin-top:14px">
+ <h2>Personnaliser mes séances Basic-Fit</h2>
+ <div class="field"><label for="gym1">Lundi</label><input id="gym1" value="16h30 – 17h30"></div>
+ <div class="field"><label for="gym2">Vendredi</label><input id="gym2" value="16h30 – 17h30"></div>
+ <div class="field"><label for="gym3">Dimanche</label><input id="gym3" value="15h00 – 16h00"></div>
+ <button class="btn" id="saveTimes">Enregistrer les horaires</button>
+ <p class="note">Tu peux modifier les horaires si le trajet ou tes cours changent.</p>
+</section>
+<div class="footer">MY WEEK · Données conservées localement dans ton navigateur.</div>
+</main>
+<script>
+const days=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const short=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const schedules={
+ A:{
+ Lundi:[['09h00–11h00','Histoire-Géographie'],['11h00–13h00','Sciences économiques et sociales'],['14h00–15h00','Mathématiques'],['15h00–16h00','Anglais']],
+ Mardi:[['08h00–09h00','Espagnol'],['10h00–12h00','Français'],['13h00–14h00','Espagnol'],['14h00–15h30','Physique-Chimie'],['15h30–17h00','SVT']],
+ Mercredi:[['09h00–11h00','Mathématiques'],['11h00–13h00','Physique-Chimie']],
+ Jeudi:[['08h00–10h00','EPS'],['11h00–12h00','Anglais'],['12h00–13h00','Sciences numériques et technologie'],['14h00–15h00','Mathématiques'],['15h00–16h00','Français'],['16h00–17h00','Histoire-Géographie']],
+ Vendredi:[['10h00–11h00','Anglais'],['14h00–15h00','Français'],['15h00–16h00','Espagnol']]
+ },
+ B:{
+ Lundi:[['09h00–11h00','Histoire-Géographie'],['11h00–13h00','Sciences économiques et sociales'],['14h00–15h00','Mathématiques'],['15h00–16h00','Anglais']],
+ Mardi:[['08h00–09h00','Espagnol'],['10h00–12h00','Français'],['13h00–14h00','Espagnol'],['14h00–15h30','Physique-Chimie'],['15h30–17h00','SVT']],
+ Mercredi:[['09h00–11h00','Mathématiques'],['11h00–13h00','Physique-Chimie']],
+ Jeudi:[['08h00–10h00','EPS'],['11h00–12h00','Anglais'],['12h00–13h00','Sciences numériques et technologie'],['14h00–15h00','Mathématiques'],['15h00–16h00','Français'],['16h00–17h00','Histoire-Géographie'],['17h00–18h00','Enseignement moral et civique']],
+ Vendredi:[['10h00–11h00','Anglais'],['13h00–14h00','Sciences numériques et technologie'],['14h00–15h00','Français']]
+ }
+};
+let week=localStorage.getItem('mw-week')||'A', selected=0;
+let checks=JSON.parse(localStorage.getItem('mw-checks')||'{}');
+let custom=JSON.parse(localStorage.getItem('mw-times')||'{"gym1":"16h30 – 17h30","gym2":"16h30 – 17h30","gym3":"15h00 – 16h00"}');
+const workout=[{id:'gym1',day:'Lundi',name:'Basic-Fit',type:'gym'},{id:'sport1',day:'Mercredi',name:'Entraînement sportif',time:'16h00 – 18h00',type:'sport'},{id:'gym2',day:'Vendredi',name:'Basic-Fit',type:'gym'},{id:'sport2',day:'Samedi',name:'Entraînement sportif',time:'14h00 – 15h30',type:'sport'},{id:'gym3',day:'Dimanche',name:'Basic-Fit',type:'gym'}];
+function save(){localStorage.setItem('mw-checks',JSON.stringify(checks));}
+function renderDays(){
+ document.getElementById('days').innerHTML=days.map((d,i)=>`<button class="daybtn ${i===selected?'active':''}" data-day="${i}">${short[i]}<small>${(schedules[week][d]||[]).length?'Cours':'Libre'}</small></button>`).join('');
+ document.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{selected=+b.dataset.day;renderDays();renderDay();});
+ renderDay();
+}
+function renderDay(){
+ const d=days[selected], classes=schedules[week][d]||[];
+ let events=classes.map(e=>`<div class="event"><span class="time">${e[0]}</span><strong>${e[1]}</strong></div>`).join('');
+ const sports=workout.filter(w=>w.day===d).map(w=>`<div class="event ${w.type}"><span class="time">${w.time||custom[w.id]}</span><strong>${w.name}</strong></div>`).join('');
+ document.getElementById('dayContent').innerHTML=(events+sports)||'<div class="empty">Journée libre — profite-en pour te reposer ou avancer tes devoirs.</div>';
+}
+function renderChecks(){
+ document.getElementById('checklist').innerHTML=workout.map(w=>`<div class="check ${checks[w.id]?'done':''}"><input type="checkbox" id="${w.id}" ${checks[w.id]?'checked':''}><label for="${w.id}"><b>${w.day} · ${w.name}</b><div class="muted">${w.time||custom[w.id]}</div></label><span class="tag">${w.type==='gym'?'SALLE':'SPORT'}</span></div>`).join('');
+ workout.forEach(w=>document.getElementById(w.id).onchange=e=>{checks[w.id]=e.target.checked;save();renderChecks();updateStats();});
+ updateStats();
+}
+function updateStats(){let n=workout.filter(w=>checks[w.id]).length;document.getElementById('doneCount').textContent=n+'/5';document.getElementById('progress').style.width=(n/5*100)+'%';}
+document.querySelectorAll('[data-week]').forEach(b=>b.onclick=()=>{week=b.dataset.week;localStorage.setItem('mw-week',week);document.querySelectorAll('[data-week]').forEach(x=>x.classList.toggle('active',x===b));renderDays();});
+document.getElementById('resetBtn').onclick=()=>{if(confirm('Réinitialiser les 5 cases de la semaine ?')){checks={};save();renderChecks();}};
+['gym1','gym2','gym3'].forEach(id=>document.getElementById(id).value=custom[id]);
+document.getElementById('saveTimes').onclick=()=>{['gym1','gym2','gym3'].forEach(id=>custom[id]=document.getElementById(id).value.trim()||custom[id]);localStorage.setItem('mw-times',JSON.stringify(custom));renderChecks();renderDay();alert('Horaires enregistrés !');};
+renderDays();renderChecks();
+let installPrompt;const installBtn=document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;installBtn.hidden=false;});
+installBtn.onclick=async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;installBtn.hidden=true;}};
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
